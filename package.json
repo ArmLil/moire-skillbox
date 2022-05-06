@@ -45,7 +45,19 @@
       "ecmaVersion": 2020
     },
     "rules": {
-      "quotes": "off"
+      "quotes": "off",
+      "vuejs-accessibility/label-has-for": [
+        "error",
+        {
+          "required": {
+            "some": [
+              "nesting",
+              "id"
+            ]
+          }
+        }
+      ],
+      "no-irregular-whitespace": "off"
     }
   },
   "browserslist": [
