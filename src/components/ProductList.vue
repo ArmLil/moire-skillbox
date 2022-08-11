@@ -1,37 +1,20 @@
 <template>
   <ul class="hello">
-    <li class="catalog__item" v-for="(product, index) in products" :key="index">
-      <a class="catalog__pic" href="#">
-        <img :src="product.image" :alt="product.title" />
-      </a>
-
-      <h3 class="catalog__title">
-        <a href="#"> {{ product.title }} </a>
-      </h3>
-
-      <span class="catalog__price"> {{ product.price }} ₽ </span>
-
-      <ul class="colors colors--black">
-        <li class="colors__item" v-for="(color, index) in product.colors" :key="index">
-          <label class="colors__label">
-            <input class="colors__radio sr-only" type="radio" :value="color" checked="" />
-            <span class="colors__value" v-bind:style="{ 'background-color': color }"> </span>
-          </label>
-        </li>
-      </ul>
-    </li>
+    <ProductItem v-for="(product, index) in products" :key="index" :product="product" />
   </ul>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import Product from "@/types/Product";
+import ProductItem from "@/components/ProductItem.vue";
 
 export default Vue.extend({
   name: "ProductList",
   props: {
     products: Array as PropType<Product[]>,
   },
+  components: { ProductItem },
 });
 </script>
 
