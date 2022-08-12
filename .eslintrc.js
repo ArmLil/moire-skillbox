@@ -22,6 +22,7 @@ module.exports = {
     "prefer-destructuring": 0,
     "linebreak-style": 0,
     "no-irregular-whitespace": 0,
+    "vuejs-accessibility/click-events-have-key-events": 0,
     "arrow-parens": 0,
     "vuejs-accessibility/label-has-for": 0,
   },
