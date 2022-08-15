@@ -25,5 +25,8 @@ module.exports = {
     "vuejs-accessibility/click-events-have-key-events": 0,
     "arrow-parens": 0,
     "vuejs-accessibility/label-has-for": 0,
+    "import/prefer-default-export": 0,
+    "vue/multi-word-component-names": 0,
+    semi: [2, "always"],
   },
 };

@@ -1,8 +1,13 @@
+import Color from "./Color";
+import Season from "./Season";
+import Material from "./Material";
+
 export default interface Product {
   id: number;
-  categoryId: number;
   title: string;
+  slug: string;
   price: number;
-  image: string;
-  colors: string[];
+  colors: Color[];
+  seasons: Season[];
+  materials: Material[];
 }

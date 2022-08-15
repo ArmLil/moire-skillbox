@@ -1,14 +1,19 @@
 <template lang="html">
   <aside class="filter">
-    <form class="filter__form form" action="#" method="get">
+    <form class="filter__form form" action="#" method="get" @submit.prevent="submit">
       <fieldset class="form__block">
         <legend class="form__legend">Цена</legend>
         <label class="form__label form__label--price">
-          <input class="form__input" type="text" name="min-price" value="0" />
+          <input
+            class="form__input"
+            type="text"
+            name="min-price"
+            v-model.number="currentPriceFrom"
+          />
           <span class="form__value">От</span>
         </label>
         <label class="form__label form__label--price">
-          <input class="form__input" type="text" name="max-price" value="12345" />
+          <input class="form__input" type="text" name="max-price" v-model.number="currentPriceTo" />
           <span class="form__value">До</span>
         </label>
       </fieldset>
@@ -16,11 +21,16 @@
       <fieldset class="form__block">
         <legend class="form__legend">Категория</legend>
         <label class="form__label form__label--select">
-          <select class="form__select" type="text" name="category">
-            <option value="value1">Все категории</option>
-            <option value="value2">Футболки</option>
-            <option value="value3">Бюстгалтеры</option>
-            <option value="value4">Носки</option>
+          <select
+            class="form__select"
+            type="text"
+            name="category"
+            v-model.number="currentCategoryId"
+          >
+            <option value="0">Все категории</option>
+            <option :value="category.id" v-for="category in categories" :key="category.id">
+              {{ category.title }}
+            </option>
           </select>
         </label>
       </fieldset>
@@ -28,20 +38,21 @@
       <fieldset class="form__block">
         <legend class="form__legend">Материал</legend>
         <ul class="check-list">
-          <li class="check-list__item">
+          <!-- <li class="check-list__item">
             <label class="check-list__label">
               <input
                 class="check-list__check sr-only"
                 type="checkbox"
                 name="material"
-                value="лен"
+                :value="material"
+                v-model="currentMaterial"
               />
               <span class="check-list__desc">
-                лен
-                <span>(3)</span>
+                material.title
+                <span>({{ material.count }})</span>
               </span>
             </label>
-          </li>
+          </li> -->
           <li class="check-list__item">
             <label class="check-list__label">
               <input
@@ -90,21 +101,22 @@
       <fieldset class="form__block">
         <legend class="form__legend">Коллекция</legend>
         <ul class="check-list">
-          <li class="check-list__item">
+          <!-- <li class="check-list__item">
             <label class="check-list__label">
               <input
                 class="check-list__check sr-only"
                 type="checkbox"
                 name="collection"
-                value="лето"
+                :value="season"
+                v-model="currentSeason"
                 checked=""
               />
               <span class="check-list__desc">
-                лето
-                <span>(2)</span>
+                {{ currentSeason.title }}
+                <span>({{ currentSeason.title }})</span>
               </span>
             </label>
-          </li>
+          </li> -->
           <li class="check-list__item">
             <label class="check-list__label">
               <input
@@ -157,7 +169,87 @@
 </template>
 
 <script>
-export default {};
+import axios from "axios";
+import { API_BASE_URL } from "@/config";
+
+export default {
+  data() {
+    return {
+      currentPriceFrom: 0,
+      currentPriceTo: 0,
+      currentCategoryId: 0,
+      currentMaterial: "",
+      currentSeason: "",
+      categoriesData: null,
+      filterMaterials: null,
+      filterSeasons: null,
+    };
+  },
+  props: ["priceFrom", "priceTo", "categoryId", "filterMaterial", "filterSeason"],
+  computed: {
+    categories() {
+      return this.categoriesData ? this.categoriesData.items : [];
+    },
+    materials() {
+      return this.filterMaterials ? this.filterMaterials.items : [];
+    },
+  },
+  watch: {
+    priceFrom(value) {
+      this.currentPriceFrom = value;
+    },
+    priceTo(value) {
+      this.currentPriceTo = value;
+    },
+    categoryId(value) {
+      this.currentCategoryId = value;
+    },
+    filterMaterial(value) {
+      this.currentMaterial = value;
+    },
+    filterSeason(value) {
+      this.currentSeason = value;
+    },
+  },
+  methods: {
+    submit() {
+      this.$emit("update:priceFrom", this.currentPriceFrom);
+      this.$emit("update:priceTo", this.currentPriceTo);
+      this.$emit("update:categoryId", this.currentCategoryId);
+      this.$emit("update:filterMaterial", this.currentMaterial);
+      this.$emit("update:filterSeason", this.currentSeason);
+      this.$emit("update:currentPage", 1);
+    },
+    reset() {
+      this.$emit("update:priceFrom", 0);
+      this.$emit("update:priceTo", 0);
+      this.$emit("update:categoryId", 0);
+      this.$emit("update:filterMaterial", "");
+      this.$emit("update:filterSeason", "");
+      this.$emit("update:currentPage", 1);
+    },
+    loadCategories() {
+      axios.get(API_BASE_URL + "api/productCategories").then((response) => {
+        this.categoriesData = response.data;
+      });
+    },
+    loadMaterials() {
+      axios.get(API_BASE_URL + "api/materials").then((response) => {
+        this.filterMaterials = response.data;
+      });
+    },
+    loadSeasons() {
+      axios.get(API_BASE_URL + "api/seasons").then((response) => {
+        this.filterSeasons = response.data;
+      });
+    },
+  },
+  created() {
+    this.loadCategories();
+    this.loadMaterials();
+    this.loadSeasons();
+  },
+};
 </script>
 
 <style lang="css" scoped></style>

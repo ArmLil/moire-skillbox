@@ -70,7 +70,7 @@ export default Vue.extend({
     };
   },
   computed: {
-    products(): Product[] {
+    products(): any {
       const offset = (this.page - 1) * this.productsPerPage;
       return products.slice(offset, offset + this.productsPerPage);
     },
