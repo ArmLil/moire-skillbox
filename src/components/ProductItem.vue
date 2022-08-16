@@ -1,7 +1,7 @@
 <template lang="html">
   <li class="catalog__item">
     <a class="catalog__pic" href="#">
-      <img :src="color.gallery[0].file.url" :alt="product.title" />
+      <img :src="img" :alt="product.title" />
     </a>
 
     <h3 class="catalog__title">
@@ -45,7 +45,6 @@ export default Vue.extend({
   data() {
     return {
       color: this.product.colors[0],
-      img: "",
     };
   },
   filters: {
@@ -53,6 +52,14 @@ export default Vue.extend({
   },
   methods: {
     gotoPage,
+  },
+  computed: {
+    img(): string | null {
+      if (this.color.gallery) {
+        return this.color.gallery[0].file.url;
+      }
+      return null;
+    },
   },
 });
 </script>

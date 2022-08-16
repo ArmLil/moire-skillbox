@@ -36,62 +36,40 @@
       </fieldset>
 
       <fieldset class="form__block">
+        <legend class="form__legend">Цвет</legend>
+        <ul class="colors">
+          <li class="colors__item" v-for="(color, index) in colors" :key="index">
+            <label class="colors__label">
+              <input
+                class="colors__radio sr-only"
+                type="checkbox"
+                name="color"
+                :value="color"
+                checked=""
+                v-model="currentColor"
+              />
+              <span class="colors__value" v-bind:style="{ 'background-color': color.code }"> </span>
+            </label>
+          </li>
+        </ul>
+      </fieldset>
+
+      <fieldset class="form__block">
         <legend class="form__legend">Материал</legend>
         <ul class="check-list">
-          <!-- <li class="check-list__item">
+          <li class="check-list__item" v-for="material in materials" :key="material.id">
             <label class="check-list__label">
               <input
                 class="check-list__check sr-only"
                 type="checkbox"
                 name="material"
                 :value="material"
-                v-model="currentMaterial"
+                v-model="currentMaterials"
+                checked=""
               />
               <span class="check-list__desc">
-                material.title
-                <span>({{ material.count }})</span>
-              </span>
-            </label>
-          </li> -->
-          <li class="check-list__item">
-            <label class="check-list__label">
-              <input
-                class="check-list__check sr-only"
-                type="checkbox"
-                name="material"
-                value="хлопок"
-              />
-              <span class="check-list__desc">
-                хлопок
-                <span>(46)</span>
-              </span>
-            </label>
-          </li>
-          <li class="check-list__item">
-            <label class="check-list__label">
-              <input
-                class="check-list__check sr-only"
-                type="checkbox"
-                name="material"
-                value="шерсть"
-              />
-              <span class="check-list__desc">
-                шерсть
-                <span>(20)</span>
-              </span>
-            </label>
-          </li>
-          <li class="check-list__item">
-            <label class="check-list__label">
-              <input
-                class="check-list__check sr-only"
-                type="checkbox"
-                name="material"
-                value="шелк"
-              />
-              <span class="check-list__desc">
-                шелк
-                <span>(30)</span>
+                {{ material.title }}
+                <span>({{ material.productsCount }})</span>
               </span>
             </label>
           </li>
@@ -101,61 +79,19 @@
       <fieldset class="form__block">
         <legend class="form__legend">Коллекция</legend>
         <ul class="check-list">
-          <!-- <li class="check-list__item">
+          <li class="check-list__item" v-for="season in seasons" :key="season.id">
             <label class="check-list__label">
               <input
                 class="check-list__check sr-only"
                 type="checkbox"
                 name="collection"
                 :value="season"
-                v-model="currentSeason"
+                v-model="currentSeasons"
                 checked=""
               />
               <span class="check-list__desc">
-                {{ currentSeason.title }}
-                <span>({{ currentSeason.title }})</span>
-              </span>
-            </label>
-          </li> -->
-          <li class="check-list__item">
-            <label class="check-list__label">
-              <input
-                class="check-list__check sr-only"
-                type="checkbox"
-                name="collection"
-                value="зима"
-              />
-              <span class="check-list__desc">
-                зима
-                <span>(53)</span>
-              </span>
-            </label>
-          </li>
-          <li class="check-list__item">
-            <label class="check-list__label">
-              <input
-                class="check-list__check sr-only"
-                type="checkbox"
-                name="collection"
-                value="весна"
-              />
-              <span class="check-list__desc">
-                весна
-                <span>(24)</span>
-              </span>
-            </label>
-          </li>
-          <li class="check-list__item">
-            <label class="check-list__label">
-              <input
-                class="check-list__check sr-only"
-                type="checkbox"
-                name="collection"
-                value="осень"
-              />
-              <span class="check-list__desc">
-                осень
-                <span>(30)</span>
+                {{ season.title }}
+                <span>({{ season.productsCount }})</span>
               </span>
             </label>
           </li>
@@ -178,20 +114,28 @@ export default {
       currentPriceFrom: 0,
       currentPriceTo: 0,
       currentCategoryId: 0,
-      currentMaterial: "",
-      currentSeason: "",
+      currentMaterials: [],
+      currentSeasons: [],
       categoriesData: null,
-      filterMaterials: null,
-      filterSeasons: null,
+      apiMaterials: null,
+      apiSeasons: null,
+      apiColors: null,
+      currentColor: "",
     };
   },
-  props: ["priceFrom", "priceTo", "categoryId", "filterMaterial", "filterSeason"],
+  props: ["priceFrom", "priceTo", "categoryId", "filterMaterials", "filterSeasons", "filterColors"],
   computed: {
     categories() {
       return this.categoriesData ? this.categoriesData.items : [];
     },
     materials() {
-      return this.filterMaterials ? this.filterMaterials.items : [];
+      return this.apiMaterials ? this.apiMaterials.items : [];
+    },
+    seasons() {
+      return this.apiSeasons ? this.apiSeasons.items : [];
+    },
+    colors() {
+      return this.apiColors ? this.apiColors.items : [];
     },
   },
   watch: {
@@ -204,11 +148,14 @@ export default {
     categoryId(value) {
       this.currentCategoryId = value;
     },
-    filterMaterial(value) {
-      this.currentMaterial = value;
+    filterMaterials(value) {
+      this.currentMaterials = value;
     },
-    filterSeason(value) {
-      this.currentSeason = value;
+    filterSeasons(value) {
+      this.currentSeasons = value;
+    },
+    filterColors(value) {
+      this.currentColors = value;
     },
   },
   methods: {
@@ -216,17 +163,19 @@ export default {
       this.$emit("update:priceFrom", this.currentPriceFrom);
       this.$emit("update:priceTo", this.currentPriceTo);
       this.$emit("update:categoryId", this.currentCategoryId);
-      this.$emit("update:filterMaterial", this.currentMaterial);
-      this.$emit("update:filterSeason", this.currentSeason);
+      this.$emit("update:filterMaterials", this.currentMaterials);
+      this.$emit("update:filterSeasons", this.currentSeasons);
+      this.$emit("update:filterColors", this.currentColors);
       this.$emit("update:currentPage", 1);
     },
     reset() {
       this.$emit("update:priceFrom", 0);
       this.$emit("update:priceTo", 0);
       this.$emit("update:categoryId", 0);
-      this.$emit("update:filterMaterial", "");
-      this.$emit("update:filterSeason", "");
+      this.$emit("update:filterMaterials", []);
+      this.$emit("update:filterSeasons", []);
       this.$emit("update:currentPage", 1);
+      this.$emit("update:filterColors", []);
     },
     loadCategories() {
       axios.get(API_BASE_URL + "api/productCategories").then((response) => {
@@ -235,12 +184,17 @@ export default {
     },
     loadMaterials() {
       axios.get(API_BASE_URL + "api/materials").then((response) => {
-        this.filterMaterials = response.data;
+        this.apiMaterials = response.data;
       });
     },
     loadSeasons() {
       axios.get(API_BASE_URL + "api/seasons").then((response) => {
-        this.filterSeasons = response.data;
+        this.apiSeasons = response.data;
+      });
+    },
+    loadColors() {
+      axios.get(API_BASE_URL + "api/colors").then((response) => {
+        this.apiColors = response.data;
       });
     },
   },
@@ -248,6 +202,7 @@ export default {
     this.loadCategories();
     this.loadMaterials();
     this.loadSeasons();
+    this.loadColors();
   },
 };
 </script>

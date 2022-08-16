@@ -1,5 +1,7 @@
 import Product from "./Product";
 
-export default interface ProductsData {
-  items?: Product[];
+interface ProductsData {
+  items: Product[];
+  pagination: { page: number; pages: number; total: number };
 }
+export default ProductsData;

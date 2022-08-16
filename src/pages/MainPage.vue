@@ -12,8 +12,9 @@
         :price-from.sync="filterPriceFrom"
         :price-to.sync="filterPriceTo"
         :category-id.sync="filterCategoryId"
-        :filter-material.sync="filterMaterial"
-        :filter-season.sync="filterSeason"
+        :filter-materials.sync="filterMaterials"
+        :filter-seasons.sync="filterSeasons"
+        :filter-colors.sync="filterColors"
         :current-page.sync="page"
       />
       <div class="home">
@@ -37,8 +38,10 @@ import axios from "axios";
 import ProductList from "@/components/ProductList.vue"; // @ is an alias to /src
 import ProductFilter from "@/components/ProductFilter.vue";
 import BasePagination from "@/components/BasePagination.vue";
-// import ProductsData from "@/types/ProductsData";
 import Product from "@/types/Product";
+import Material from "@/types/Material";
+import Season from "@/types/Season";
+import Color from "@/types/Color";
 import { API_BASE_URL } from "@/config";
 import Loader from "@/components/Loader.vue";
 
@@ -57,23 +60,21 @@ export default Vue.extend({
       filterCategoryId: 0,
       page: 1,
       productsPerPage: 4,
-      filterMaterial: { id: "" },
-      filterSeason: { id: "" },
+      filterMaterials: [],
+      filterSeasons: [],
+      filterColors: [],
       productsData: { items: [], pagination: { page: 1, pages: 1, total: 10 } },
       productLoading: false,
       productsLoadingFailed: false,
       loadProductsTimer: 0,
+      materialIds: [],
+      seasonIds: [],
+      colorIds: [],
     };
   },
   computed: {
-    products(): any {
-      return this.productsData && this.productsData.items
-        ? this.productsData.items.map((product: Product) => {
-            return {
-              ...product,
-            };
-          })
-        : [];
+    products(): Product[] {
+      return this.productsData.items;
     },
     productCount(): number {
       return this.productsData ? this.productsData.pagination.total : 0;
@@ -93,14 +94,15 @@ export default Vue.extend({
               categoryId: this.filterCategoryId,
               minPrice: this.filterPriceFrom,
               maxPrice: this.filterPriceTo,
-              materialId: this.filterMaterial.id,
-              seasonId: this.filterSeason.id,
+              materialIds: this.materialIds,
+              seasonIds: this.seasonIds,
+              colorIds: this.colorIds,
             },
           })
           .then((response: any) => {
-            console.log({ response });
-
-            this.productsData = response.data;
+            if (response.data) {
+              this.productsData = response.data;
+            } else throw new Error("Incorrect response");
           })
           .catch(() => {
             this.productsLoadingFailed = true;
@@ -124,10 +126,16 @@ export default Vue.extend({
     filterCategoryId() {
       this.loadProducts();
     },
-    filterMaterial() {
+    filterMaterials(values) {
+      this.materialIds = values.map((el: Material) => el.id);
       this.loadProducts();
     },
-    filterSeason() {
+    filterSeasons(values) {
+      this.seasonIds = values.map((el: Season) => el.id);
+      this.loadProducts();
+    },
+    filterColors(values) {
+      this.colorIds = values.map((el: Color) => el.id);
       this.loadProducts();
     },
   },
