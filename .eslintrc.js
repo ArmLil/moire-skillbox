@@ -27,5 +27,6 @@ module.exports = {
     "vuejs-accessibility/label-has-for": 0,
     "import/prefer-default-export": 0,
     "vue/multi-word-component-names": 0,
+    "operator-linebreak": 0,
   },
 };

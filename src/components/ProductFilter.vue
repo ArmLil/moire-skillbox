@@ -37,8 +37,8 @@
 
       <fieldset class="form__block">
         <legend class="form__legend">Цвет</legend>
-        <ul class="colors">
-          <li class="colors__item" v-for="(color, index) in colors" :key="index">
+        <ul class="colors colors--black">
+          <li class="colors__item" v-for="color in colors" :key="color.id">
             <label class="colors__label">
               <input
                 class="colors__radio sr-only"
@@ -46,7 +46,7 @@
                 name="color"
                 :value="color"
                 checked=""
-                v-model="currentColor"
+                v-model="currentColors"
               />
               <span class="colors__value" v-bind:style="{ 'background-color': color.code }"> </span>
             </label>
@@ -99,7 +99,14 @@
       </fieldset>
 
       <button class="filter__submit button button--primery" type="submit">Применить</button>
-      <button class="filter__reset button button--second" type="button">Сбросить</button>
+      <button
+        class="filter__reset button button--second"
+        type="button"
+        v-if="resetButton"
+        @click.prevent="reset"
+      >
+        Сбросить
+      </button>
     </form>
   </aside>
 </template>
@@ -120,7 +127,8 @@ export default {
       apiMaterials: null,
       apiSeasons: null,
       apiColors: null,
-      currentColor: "",
+      currentColors: [],
+      resetButton: false,
     };
   },
   props: ["priceFrom", "priceTo", "categoryId", "filterMaterials", "filterSeasons", "filterColors"],
@@ -157,6 +165,25 @@ export default {
     filterColors(value) {
       this.currentColors = value;
     },
+
+    currentPriceFrom() {
+      this.actResetButton();
+    },
+    currentPriceTo() {
+      this.actResetButton();
+    },
+    currentCategoryId() {
+      this.actResetButton();
+    },
+    currentMaterials() {
+      this.actResetButton();
+    },
+    currentSeasons() {
+      this.actResetButton();
+    },
+    currentColors() {
+      this.actResetButton();
+    },
   },
   methods: {
     submit() {
@@ -169,6 +196,12 @@ export default {
       this.$emit("update:currentPage", 1);
     },
     reset() {
+      this.currentPriceFrom = 0;
+      this.currentPriceTo = 0;
+      this.currentCategoryId = 0;
+      this.currentMaterials = [];
+      this.currentSeasons = [];
+      this.currentColors = [];
       this.$emit("update:priceFrom", 0);
       this.$emit("update:priceTo", 0);
       this.$emit("update:categoryId", 0);
@@ -176,6 +209,18 @@ export default {
       this.$emit("update:filterSeasons", []);
       this.$emit("update:currentPage", 1);
       this.$emit("update:filterColors", []);
+    },
+    actResetButton() {
+      if (
+        this.currentPriceFrom > 0 ||
+        this.currentPriceTo > 0 ||
+        this.currentCategoryId > 0 ||
+        this.currentMaterials.length > 0 ||
+        this.currentSeasons.length > 0 ||
+        this.currentColors.length > 0
+      ) {
+        this.resetButton = true;
+      } else this.resetButton = false;
     },
     loadCategories() {
       axios.get(API_BASE_URL + "api/productCategories").then((response) => {
