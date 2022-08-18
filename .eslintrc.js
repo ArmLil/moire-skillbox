@@ -28,5 +28,7 @@ module.exports = {
     "import/prefer-default-export": 0,
     "vue/multi-word-component-names": 0,
     "operator-linebreak": 0,
+    "max-len": 0,
+    "vuejs-accessibility/form-control-has-label": 0,
   },
 };

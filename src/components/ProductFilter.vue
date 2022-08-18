@@ -48,7 +48,11 @@
                 checked=""
                 v-model="currentColors"
               />
-              <span class="colors__value" v-bind:style="{ 'background-color': color.code }"> </span>
+              <span
+                class="colors__value"
+                v-bind:style="{ 'background-color': color.code, border: '1px solid grey' }"
+              >
+              </span>
             </label>
           </li>
         </ul>
